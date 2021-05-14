@@ -19,8 +19,6 @@ def gather_20_newsgroups_data():
     return train_dir, test_dir, list_newsgroups
 
 
-train_dir, test_dir, list_newsgroups = gather_20_newsgroups_data()
-
 with open('../datasets/20news-bydate/stop_words.txt') as f:
     stop_words = f.read().splitlines()
 
@@ -48,16 +46,6 @@ def collect_data_from(parent_dir, newsgroup_list):
     return data
 
 
-train_data = collect_data_from(parent_dir=train_dir, newsgroup_list=list_newsgroups)
-test_data = collect_data_from(parent_dir=test_dir, newsgroup_list=list_newsgroups)
-full_data = train_data + test_data
-with open('../datasets/20news-bydate/20news-train-processed.txt', 'w') as f:
-    f.write('\n'.join(train_data))
-with open('../datasets/20news-bydate/20news-test-processed.txt', 'w') as f:
-    f.write('\n'.join(test_data))
-with open('../datasets/20news-bydate/20news-full-processed.txt', 'w') as f:
-    f.write('\n'.join(full_data))
-
 def generate_vocabulary(data_path):
     def compute_idf(df, corpus_size):
         assert df > 0
@@ -82,8 +70,6 @@ def generate_vocabulary(data_path):
     print('Vocabulary size: {}'.format(len(words_idfs)))
     with open('../datasets/20news-bydate/words_idfs.txt', 'w') as f:
         f.write('\n'.join([word + '<fff>' + str(idf) for word, idf in words_idfs]))
-
-generate_vocabulary('../datasets/20news-bydate/20news-full-processed.txt')
 
 
 def get_tf_idf(data_path):
@@ -121,4 +107,16 @@ def get_tf_idf(data_path):
                            for label, doc_id, sparse_rep in data_tf_idf]))
 
 
-get_tf_idf('../datasets/20news-bydate/20news-full-processed.txt')
+if __name__ == '__main__':
+    train_dir, test_dir, list_newsgroups = gather_20_newsgroups_data()
+    train_data = collect_data_from(parent_dir=train_dir, newsgroup_list=list_newsgroups)
+    test_data = collect_data_from(parent_dir=test_dir, newsgroup_list=list_newsgroups)
+    full_data = train_data + test_data
+    with open('../datasets/20news-bydate/20news-train-processed.txt', 'w') as f:
+        f.write('\n'.join(train_data))
+    with open('../datasets/20news-bydate/20news-test-processed.txt', 'w') as f:
+        f.write('\n'.join(test_data))
+    with open('../datasets/20news-bydate/20news-full-processed.txt', 'w') as f:
+        f.write('\n'.join(full_data))
+    generate_vocabulary('../datasets/20news-bydate/20news-full-processed.txt')
+    get_tf_idf('../datasets/20news-bydate/20news-full-processed.txt')
