@@ -55,23 +55,26 @@ class Kmeans:
             self._data.append(Member(r_d=r_d, label=label, doc_id=doc_id))
 
     def random_init(self, seed_value):
-        # # Normal
+        # Normal
         random.seed(seed_value)
         for i in range(self._num_clusters):
             self._clusters[i]._centroid = self._data[random.randint(1, len(self._data))]._r_d
 
+
+    def random_init_kmeans_plus(self, seed_value):
         # Kmeans++
+        random.seed(seed_value)
         # Initialize one point at random.
-        # self._clusters[0]._centroid = self._data[random.randrange(len(self._data))]._r_d
-        # num_centroids_chosen = 1
-        # # Calculate for each point the distance of the point from its nearest center. Sample a point with the largest
-        # # probability proportional to the square of the distance of the point from its nearest center
-        # for i in range(1, self._num_clusters):
-        #     nearest_dis = [np.min(np.array([self.compute_similarity(self._data[member_id], self._clusters[cluster_id]._centroid)
-        #                           for cluster_id in range(num_centroids_chosen)]))
-        #          for member_id in range(len(self._data))]
-        #     self._clusters[i]._centroid = self._data[np.argmax(np.array(nearest_dis))]._r_d
-        #     num_centroids_chosen += 1
+        self._clusters[0]._centroid = self._data[random.randrange(len(self._data))]._r_d
+        num_centroids_chosen = 1
+        # Calculate for each point the distance of the point from its nearest center. Sample a point with the largest
+        # probability proportional to the square of the distance of the point from its nearest center
+        for i in range(1, self._num_clusters):
+            nearest_dis = [np.min(np.array([self.compute_similarity(self._data[member_id], self._clusters[cluster_id]._centroid)
+                                  for cluster_id in range(num_centroids_chosen)]))
+                 for member_id in range(len(self._data))]
+            self._clusters[i]._centroid = self._data[np.argmax(np.array(nearest_dis))]._r_d
+            num_centroids_chosen += 1
 
     def compute_similarity(self, member, centroid):
         # Using Cosine similarity:
@@ -168,8 +171,9 @@ class Kmeans:
         return I_value * 2. / (H_omega + H_C)
 
 
-kmeans = Kmeans(num_clusters=10)
-kmeans.load_data(data_path='../datasets/20news-bydate/data_tf_idf.txt')
-kmeans.run(seed_value=2020, criterion='centroid', threshold=2)
-print('Purity:', kmeans.compute_purity()) # 0.3808
-print('NMI:', kmeans.compute_NMI()) # 0.525
+if __name__ = '__main__':
+    kmeans = Kmeans(num_clusters=10)
+    kmeans.load_data(data_path='../datasets/20news-bydate/data_tf_idf.txt')
+    kmeans.run(seed_value=2020, criterion='centroid', threshold=2)
+    print('Purity:', kmeans.compute_purity()) # 0.3808
+    print('NMI:', kmeans.compute_NMI()) # 0.525
